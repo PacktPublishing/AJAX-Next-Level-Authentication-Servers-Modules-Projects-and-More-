@@ -1,0 +1,56 @@
+<html>
+    <head>
+        <title>AJAX Auth</title>
+    </head>
+    <body>
+        <!-- LOGIN FORM -->
+        <form onsubmit="loadSecret(event)">
+            <input id="username" placeholder="Name" value="" required>
+            <input type="password" id="password" placeholder="Password" value="" required>
+            <input type="submit" value="Load secret message">
+        </form>
+        <!-- CONTAINER TO LOAD OUR SECRET MESSAGE -->
+        <div id="demo"></div>
+        <script>
+            // WRITE AJAX REQUEST
+            function loadSecret(e) {
+                // prevent the browser from refreshing the page when a form SUBMIT event is fired
+                e.preventDefault();
+
+                // grab username and password
+                let username = document.getElementById('username').value;
+                let password = document.getElementById('password').value;
+
+                // create our own Base64 token
+                let encodedData = window.btoa(username + ':' + password);
+                let authToken = `Basic ${encodedData}`;
+
+                
+                // set up our Fetch API AJAX request
+                // implement the browser's Headers interface
+                let h = new Headers();
+                h.append('Authorization', authToken);
+
+                // define our GET URL 
+                let url = "./protected/secret.html";
+
+                // implement the browser's Request interface
+                let req = new Request(url, {
+                    method: "GET",
+                    headers: h
+                });
+
+                // finally, let's execute our fetch request
+                fetch(req)
+                    // we have to grab the data returned, and then read it to completion with the text() method
+                    .then(data => data.text())
+                    // finally we can grab our data and insert it into the page
+                    .then(message => document.getElementById('demo').innerHTML = message)
+                    .catch(err => {
+                        // you can define your own custom error handlers here
+                        alert(err);
+                    })
+            }
+        </script>
+    </body>
+</html>
